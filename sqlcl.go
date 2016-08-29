@@ -53,7 +53,7 @@ func (s *Server) Close() error {
 
 func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	rows, err := s.DB.Query(q.Sql(), args...)
+	rows, err := s.DB.Query(q.Sql(false), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
 func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	rows, err := s.DB.Query(q.Sql(), args...)
+	rows, err := s.DB.Query(q.Sql(false), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error)
 		return nil, fmt.Errorf("No Args")
 	}
 
-	stmt, err := s.DB.Prepare(q.Sql())
+	stmt, err := s.DB.Prepare(q.Sql(true))
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 		return nil, fmt.Errorf("No Args")
 	}
 
-	stmt, err := s.DB.Prepare(q.Sql())
+	stmt, err := s.DB.Prepare(q.Sql(true))
 	if err != nil {
 		return nil, err
 	}

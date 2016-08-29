@@ -48,7 +48,10 @@ func (s QScores) Swap(i, j int) {
 }
 
 func NewQuerySet() *QuerySet {
-	return &QuerySet{Set: make(map[string]string)}
+	return &QuerySet{
+		Filters: []string{},
+		Set:     make(map[string]string),
+	}
 }
 
 func (q *QuerySet) InsertTable(table string) *QuerySet {
@@ -57,7 +60,7 @@ func (q *QuerySet) InsertTable(table string) *QuerySet {
 }
 
 func (q *QuerySet) InsertFields(fields string) *QuerySet {
-	q.Set[QINSERTFIELDS] = fmt.Sprintf(" %s ", fields)
+	q.Set[QINSERTFIELDS] = fmt.Sprintf(" (%s) ", fields)
 	return q
 }
 
@@ -191,11 +194,12 @@ func (q *QuerySet) Limit(offset, num uint64) *QuerySet {
 	return q
 }
 
-func (q *QuerySet) Sql() string {
+func (q *QuerySet) Sql(strip bool) string {
 
 	var (
-		sql string
-		qss = QScores{}
+		sql     string
+		qss     = QScores{}
+		filters = strings.Join(q.Filters, " ")
 	)
 
 	for k, v := range q.Set {
@@ -207,9 +211,13 @@ func (q *QuerySet) Sql() string {
 		})
 	}
 
+	if strip {
+		filters = strings.Replace(strings.Join(q.Filters, " "), "\"", "", -1)
+	}
+
 	qss = append(qss, QScore{
 		Score: 53,
-		Value: strings.Join(q.Filters, " "),
+		Value: filters,
 	})
 
 	sort.Sort(qss)
