@@ -1,4 +1,4 @@
-// Copyright 2016 The Ssdbcl Author. All Rights Reserved.
+// Copyright 2016 The Sqlcl Author. All Rights Reserved.
 
 package sqlcl
 
@@ -51,9 +51,9 @@ func (s *Server) Close() error {
 	return s.DB.Close()
 }
 
-func (s *Server) Query(q string, args ...interface{}) (*Result, error) {
+func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	rows, err := s.DB.Query(q, args...)
+	rows, err := s.DB.Query(q.Sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +61,9 @@ func (s *Server) Query(q string, args ...interface{}) (*Result, error) {
 	return parseRows(rows)
 }
 
-func (s *Server) QueryRow(q string, args ...interface{}) (*RowColumn, error) {
-	rows, err := s.DB.Query(q, args...)
+func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
+
+	rows, err := s.DB.Query(q.Sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +80,12 @@ func (s *Server) QueryRow(q string, args ...interface{}) (*RowColumn, error) {
 	return &rst.Data[0], err
 }
 
-func (s *Server) PrepareQuery(q string, args ...interface{}) (*Result, error) {
+func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error) {
+	if len(args) < 1 {
+		return nil, fmt.Errorf("No Args")
+	}
 
-	stmt, err := s.DB.Prepare(q)
+	stmt, err := s.DB.Prepare(q.Sql())
 	if err != nil {
 		return nil, err
 	}
@@ -95,9 +99,13 @@ func (s *Server) PrepareQuery(q string, args ...interface{}) (*Result, error) {
 	return parseRows(rows)
 }
 
-func (s *Server) PrepareQueryRow(q string, args ...interface{}) (*RowColumn, error) {
+func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	stmt, err := s.DB.Prepare(q)
+	if len(args) < 1 {
+		return nil, fmt.Errorf("No Args")
+	}
+
+	stmt, err := s.DB.Prepare(q.Sql())
 	if err != nil {
 		return nil, err
 	}

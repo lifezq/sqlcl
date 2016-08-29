@@ -1,8 +1,9 @@
+// Copyright 2016 The Sqlcl Author. All Rights Reserved.
+
 package sqlcl
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -14,13 +15,12 @@ const (
 	QINSERTVALUES = "2VALUES"
 	QUPDATE       = "0UPDATE TABLE"
 	QUPDATESET    = "1SET"
-	QSELECT       = "2SELECT"
-	QFROM         = "3FROM"
-	QTABLE        = "4TABLE"
-	QWHERE        = "5WHERE"
-	QAND          = "6AND"
-	QOR           = "7OR"
-	QLIMIT        = "9LIMIT"
+	QSELECT       = "0SELECT"
+	QFROM         = "1FROM"
+	QWHERE        = "3WHERE"
+	QAND          = "4AND"
+	QOR           = "4OR"
+	QLIMIT        = "6LIMIT"
 )
 
 type QuerySet struct {
@@ -67,7 +67,7 @@ func (q *QuerySet) InsertValues(values string) *QuerySet {
 }
 
 func (q *QuerySet) UpdateTable(table string) *QuerySet {
-	q.Set[QUPDATE] = fmt.Sprintf(" %s %s ", QUPDATE[1:], table)
+	q.Set[QUPDATE] = fmt.Sprintf(" %s `%s` ", QUPDATE[1:], table)
 	return q
 }
 
@@ -82,12 +82,7 @@ func (q *QuerySet) Select(fields string) *QuerySet {
 }
 
 func (q *QuerySet) From(table string) *QuerySet {
-	q.Set[QTABLE] = fmt.Sprintf(" %s %s ", QFROM[1:], table)
-	return q
-}
-
-func (q *QuerySet) Table(table string) *QuerySet {
-	q.Set[QTABLE] = fmt.Sprintf(" `%s` ", table)
+	q.Set[QFROM] = fmt.Sprintf(" %s `%s` ", QFROM[1:], table)
 	return q
 }
 
@@ -118,6 +113,16 @@ func (q *QuerySet) Or(name string) *QuerySet {
 	}
 
 	q.Filters = append(q.Filters, fmt.Sprintf(" %s %s ", QOR[1:], name))
+	return q
+}
+
+func (q *QuerySet) In(name string) *QuerySet {
+
+	if strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.Filters = append(q.Filters, fmt.Sprintf(" IN (%s) ", name))
 	return q
 }
 
@@ -203,7 +208,7 @@ func (q *QuerySet) Sql() string {
 	}
 
 	qss = append(qss, QScore{
-		Score: 56,
+		Score: 53,
 		Value: strings.Join(q.Filters, " "),
 	})
 
@@ -214,6 +219,5 @@ func (q *QuerySet) Sql() string {
 		sql += v.Value
 	}
 
-	log.Printf("qss:%v \nsql:%s\n", qss, sql)
 	return sql
 }
