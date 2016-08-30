@@ -55,6 +55,11 @@ func NewQuerySet() *QuerySet {
 	}
 }
 
+func (q *QuerySet) Clear() *QuerySet {
+	*q = *NewQuerySet()
+	return q
+}
+
 func (q *QuerySet) InsertTable(table string) *QuerySet {
 	q.Set[QINSERTTABLE] = fmt.Sprintf(" %s `%s` ", QINSERTTABLE[1:], table)
 	return q
