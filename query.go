@@ -227,7 +227,7 @@ func (q *QuerySet) Sql(strip bool) string {
 	}
 
 	qss = append(qss, QScore{
-		Score: 53,
+		Score: 0x35,
 		Value: filters,
 	})
 
