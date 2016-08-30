@@ -13,8 +13,9 @@ const (
 	QINSERTTABLE  = "0INSERT INTO "
 	QINSERTFIELDS = "1INSERTFIELDS"
 	QINSERTVALUES = "2VALUES"
-	QUPDATE       = "0UPDATE TABLE"
+	QUPDATE       = "0UPDATE "
 	QUPDATESET    = "1SET"
+	QDELETE       = "0DELETE"
 	QSELECT       = "0SELECT"
 	QFROM         = "1FROM"
 	QWHERE        = "3WHERE"
@@ -76,6 +77,11 @@ func (q *QuerySet) UpdateTable(table string) *QuerySet {
 
 func (q *QuerySet) UpdateSet(values string) *QuerySet {
 	q.Set[QUPDATESET] = fmt.Sprintf(" %s %s ", QUPDATESET[1:], values)
+	return q
+}
+
+func (q *QuerySet) Delete() *QuerySet {
+	q.Set[QDELETE] = fmt.Sprintf(" %s ", QDELETE[1:])
 	return q
 }
 

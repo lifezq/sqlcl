@@ -23,11 +23,11 @@ func arrayRemove(a []string, s string) []string {
 func main() {
 
 	qset := sqlcl.NewQuerySet()
-	qset.Select("*").From("table_bench").Where("id").Eq("30000").
+	qset.Select("*").From("test_temp").Where("id").Eq("30000").
 		And("id").Gt("40000").Or("title").Neq("title_01").Limit(100, 20)
 	log.Printf("sql:%s\n", qset.Sql(false))
 
-	qset = sqlcl.NewQuerySet().InsertTable("test_temp").InsertFields("(title,content)").InsertValues("('fdsfds','fdsfd'),('vvvvvv','ddddd')")
+	qset = sqlcl.NewQuerySet().InsertTable("test_temp").InsertFields("title,content").InsertValues("('fdsfds','fdsfd'),('vvvvvv','ddddd')")
 
 	log.Printf("sql:%s\n", qset.Sql(false))
 
@@ -35,6 +35,10 @@ func main() {
 	log.Printf("sql:%s\n", qset.Sql(false))
 
 	qset = sqlcl.NewQuerySet().Select("*").From("test_temp").Where("id").In("31,32,33,100")
+
+	log.Printf("sql:%s\n", qset.Sql(false))
+
+	qset = sqlcl.NewQuerySet().Delete().From("test_temp").Where("id").In("31,32,33,100")
 
 	log.Printf("sql:%s\n", qset.Sql(false))
 
