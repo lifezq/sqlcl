@@ -7,11 +7,12 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Config struct {
-	Driver   string
-	Addr     string
+	Driver   string // mysql/sqlite3
+	Addr     string // mysql:127.0.0.1:3306/sqlite3:/tmp/foo.db or :memory:
 	User     string
 	Pass     string
 	DbName   string
@@ -31,15 +32,24 @@ type Result struct {
 
 func New(c Config) (*Server, error) {
 
-	if c.Driver != "mysql" {
+	dsn := ""
+
+	switch c.Driver {
+	case "mysql":
+		if len(c.Protocol) < 3 {
+			c.Protocol = "tcp"
+		}
+		dsn = fmt.Sprintf("%s:%s@%s(%s)/%s?%s", c.User, c.Pass, c.Protocol, c.Addr, c.DbName, c.Params)
+
+	case "sqlite3":
+		dsn = c.Addr
+
+	default:
+
 		return nil, fmt.Errorf("Unknow db driver:%s", c.Driver)
 	}
 
-	if len(c.Protocol) < 3 {
-		c.Protocol = "tcp"
-	}
-
-	db, err := sql.Open(c.Driver, fmt.Sprintf("%s:%s@%s(%s)/%s?%s", c.User, c.Pass, c.Protocol, c.Addr, c.DbName, c.Params))
+	db, err := sql.Open(c.Driver, dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -80,18 +90,34 @@ func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) 
 	return &rst.Data[0], err
 }
 
+func (s *Server) Prepare(q *QuerySet) error {
+
+	var err error
+	q.Stmt, err = s.DB.Prepare(q.Sql(true))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error) {
+
 	if len(args) < 1 {
 		return nil, fmt.Errorf("No Args")
 	}
 
-	stmt, err := s.DB.Prepare(q.Sql(true))
-	if err != nil {
-		return nil, err
+	if q.Stmt == nil {
+
+		var err error
+		q.Stmt, err = s.DB.Prepare(q.Sql(true))
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	rows, err := stmt.Query(args...)
-	defer stmt.Close()
+	rows, err := q.Stmt.Query(args...)
+	// defer q.Stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -105,13 +131,17 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 		return nil, fmt.Errorf("No Args")
 	}
 
-	stmt, err := s.DB.Prepare(q.Sql(true))
-	if err != nil {
-		return nil, err
+	if q.Stmt == nil {
+
+		var err error
+		q.Stmt, err = s.DB.Prepare(q.Sql(true))
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	rows, err := stmt.Query(args...)
-	defer stmt.Close()
+	rows, err := q.Stmt.Query(args...)
+	//	defer q.Stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +156,31 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 	}
 
 	return &rst.Data[0], nil
+}
+
+func (s *Server) PrepareExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
+
+	if len(args) < 1 {
+		return nil, fmt.Errorf("No Args")
+	}
+
+	if q.Stmt == nil {
+
+		var err error
+		q.Stmt, err = s.DB.Prepare(q.Sql(true))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return q.Stmt.Exec(args...)
+}
+
+func (s *Server) PrepareClose(q *QuerySet) {
+
+	if q.Stmt != nil {
+		q.Stmt.Close()
+	}
 }
 
 func (s *Server) Exec(q string) (sql.Result, error) {

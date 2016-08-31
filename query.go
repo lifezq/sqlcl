@@ -3,6 +3,7 @@
 package sqlcl
 
 import (
+	"database/sql"
 	"fmt"
 	"sort"
 	"strconv"
@@ -24,11 +25,6 @@ const (
 	QLIMIT        = "6LIMIT"
 )
 
-type QuerySet struct {
-	Filters []string
-	Set     map[string]string
-}
-
 type QScore struct {
 	Score int
 	Value string
@@ -46,6 +42,12 @@ func (s QScores) Less(i, j int) bool {
 
 func (s QScores) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
+}
+
+type QuerySet struct {
+	Stmt    *sql.Stmt
+	Filters []string
+	Set     map[string]string
 }
 
 func NewQuerySet() *QuerySet {
@@ -202,6 +204,11 @@ func (q *QuerySet) Le(name string) *QuerySet {
 
 func (q *QuerySet) Limit(offset, num uint64) *QuerySet {
 	q.Set[QLIMIT] = fmt.Sprintf(" %s %d,%d", QLIMIT[1:], offset, num)
+	return q
+}
+
+func (q *QuerySet) LimitString(limit string) *QuerySet {
+	q.Set[QLIMIT] = fmt.Sprintf(" %s %s", QLIMIT[1:], limit)
 	return q
 }
 
