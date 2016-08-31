@@ -1,18 +1,16 @@
+// Copyright 2016 The Sqlcl Author. All Rights Reserved.
+
 package sqlcl
 
 import "testing"
 
-func db_conn() (*Server, error) {
-	return New(Config{
+func TestSqlite3(t *testing.T) {
+
+	db, err := New(Config{
 		Driver: "sqlite3",
 		//Addr:   ":memory:",
 		Addr: "./foo.db",
 	})
-}
-
-func TestSqlite3(t *testing.T) {
-
-	db, err := db_conn()
 	if err != nil {
 		t.Fatalf("db conn err:%s", err.Error())
 	}
