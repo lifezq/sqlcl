@@ -1,4 +1,6 @@
-// Copyright 2016 The Author. All Rights Reserved.
+// Copyright 2016 The Sqlcl Author. All Rights Reserved.
+//
+// -----------------------------------------------------
 
 package sqlcl
 
