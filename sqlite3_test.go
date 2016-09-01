@@ -27,7 +27,7 @@ func TestSqlite3(t *testing.T) {
 	if err != nil {
 		t.Fatalf("#001  err:%v\n", err)
 	}
-	t.Logf("#001 sql:%s  err:%v\n", qset.Sql(), err)
+	t.Logf("#001 sql:%s  err:%v\n", qset.sql(), err)
 
 	for i := 0; i < 1000; i++ {
 

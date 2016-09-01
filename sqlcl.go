@@ -63,7 +63,7 @@ func (s *Server) Close() error {
 
 func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	rows, err := s.DB.Query(q.Sql(), args...)
+	rows, err := s.DB.Query(q.sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
 func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	rows, err := s.DB.Query(q.Sql(), args...)
+	rows, err := s.DB.Query(q.sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +92,10 @@ func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) 
 
 func (s *Server) Prepare(q *QuerySet) error {
 
-	q.Strip = true
+	q.strip = true
 
 	var err error
-	q.Stmt, err = s.DB.Prepare(q.Sql())
+	q.stmt, err = s.DB.Prepare(q.sql())
 	if err != nil {
 		return err
 	}
@@ -109,20 +109,20 @@ func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error)
 		return nil, fmt.Errorf("No Args")
 	}
 
-	if q.Stmt == nil {
+	if q.stmt == nil {
 
-		q.Strip = true
+		q.strip = true
 
 		var err error
-		q.Stmt, err = s.DB.Prepare(q.Sql())
+		q.stmt, err = s.DB.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
 
 	}
 
-	rows, err := q.Stmt.Query(args...)
-	// defer q.Stmt.Close()
+	rows, err := q.stmt.Query(args...)
+	// defer q.stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -136,20 +136,20 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 		return nil, fmt.Errorf("No Args")
 	}
 
-	if q.Stmt == nil {
+	if q.stmt == nil {
 
-		q.Strip = true
+		q.strip = true
 
 		var err error
-		q.Stmt, err = s.DB.Prepare(q.Sql())
+		q.stmt, err = s.DB.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
 
 	}
 
-	rows, err := q.Stmt.Query(args...)
-	//	defer q.Stmt.Close()
+	rows, err := q.stmt.Query(args...)
+	//	defer q.stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -172,25 +172,25 @@ func (s *Server) PrepareExec(q *QuerySet, args ...interface{}) (sql.Result, erro
 		return nil, fmt.Errorf("No Args")
 	}
 
-	if q.Stmt == nil {
+	if q.stmt == nil {
 
-		q.Strip = true
+		q.strip = true
 
 		var err error
-		q.Stmt, err = s.DB.Prepare(q.Sql())
+		q.stmt, err = s.DB.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
 
 	}
 
-	return q.Stmt.Exec(args...)
+	return q.stmt.Exec(args...)
 }
 
 func (s *Server) PrepareClose(q *QuerySet) {
 
-	if q.Stmt != nil {
-		q.Stmt.Close()
+	if q.stmt != nil {
+		q.stmt.Close()
 	}
 }
 
@@ -201,7 +201,7 @@ func (s *Server) Exec(q string) (sql.Result, error) {
 func (s *Server) TxBegin(q *QuerySet) error {
 
 	var err error
-	q.Tx, err = s.DB.Begin()
+	q.tx, err = s.DB.Begin()
 	if err != nil {
 		return err
 	}
@@ -211,43 +211,43 @@ func (s *Server) TxBegin(q *QuerySet) error {
 
 func (s *Server) TxCommit(q *QuerySet) error {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return fmt.Errorf("Client Error")
 	}
 
-	return q.Tx.Commit()
+	return q.tx.Commit()
 }
 
 func (s *Server) TxExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	return q.Tx.Exec(q.Sql(), args...)
+	return q.tx.Exec(q.sql(), args...)
 }
 
 func (s *Server) TxPrepare(q *QuerySet) error {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return fmt.Errorf("Client Error")
 	}
 
-	q.Strip = true
+	q.strip = true
 
 	var err error
-	q.Stmt, err = q.Tx.Prepare(q.Sql())
+	q.stmt, err = q.tx.Prepare(q.sql())
 
 	return err
 }
 
 func (s *Server) TxQuery(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	rows, err := q.Tx.Query(q.Sql(), args...)
+	rows, err := q.tx.Query(q.sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -257,11 +257,11 @@ func (s *Server) TxQuery(q *QuerySet, args ...interface{}) (*Result, error) {
 
 func (s *Server) TxQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	rows, err := q.Tx.Query(q.Sql(), args...)
+	rows, err := q.tx.Query(q.sql(), args...)
 
 	rst, err := parseRows(rows)
 	if err != nil {
@@ -277,20 +277,20 @@ func (s *Server) TxQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error
 
 func (s *Server) TxRollBack(q *QuerySet) error {
 
-	if q.Tx == nil {
+	if q.tx == nil {
 		return fmt.Errorf("Client Error")
 	}
 
-	return q.Tx.Rollback()
+	return q.tx.Rollback()
 }
 
 func (s *Server) TxStmtQuery(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	if q.Tx == nil || q.Stmt == nil {
+	if q.tx == nil || q.stmt == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	rows, err := q.Tx.Stmt(q.Stmt).Query(args...)
+	rows, err := q.tx.Stmt(q.stmt).Query(args...)
 	if err != nil {
 		return nil, err
 	}
@@ -300,11 +300,11 @@ func (s *Server) TxStmtQuery(q *QuerySet, args ...interface{}) (*Result, error) 
 
 func (s *Server) TxStmtQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	if q.Tx == nil || q.Stmt == nil {
+	if q.tx == nil || q.stmt == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	rows, err := q.Tx.Stmt(q.Stmt).Query(args...)
+	rows, err := q.tx.Stmt(q.stmt).Query(args...)
 	if err != nil {
 		return nil, err
 	}
@@ -323,11 +323,11 @@ func (s *Server) TxStmtQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, e
 
 func (s *Server) TxStmtExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
 
-	if q.Tx == nil || q.Stmt == nil {
+	if q.tx == nil || q.stmt == nil {
 		return nil, fmt.Errorf("Client Error")
 	}
 
-	return q.Tx.Stmt(q.Stmt).Exec(args...)
+	return q.tx.Stmt(q.stmt).Exec(args...)
 }
 
 func parseRows(rows *sql.Rows) (*Result, error) {

@@ -26,8 +26,8 @@ const (
 )
 
 type QScore struct {
-	Score int
-	Value string
+	score int
+	value string
 }
 
 type QScores []QScore
@@ -37,7 +37,7 @@ func (s QScores) Len() int {
 }
 
 func (s QScores) Less(i, j int) bool {
-	return s[i].Score < s[j].Score
+	return s[i].score < s[j].score
 }
 
 func (s QScores) Swap(i, j int) {
@@ -45,17 +45,17 @@ func (s QScores) Swap(i, j int) {
 }
 
 type QuerySet struct {
-	Stmt    *sql.Stmt
-	Tx      *sql.Tx
-	Strip   bool
-	Filters []string
-	Set     map[string]string
+	stmt    *sql.Stmt
+	tx      *sql.Tx
+	strip   bool
+	filters []string
+	set     map[string]string
 }
 
 func NewQuerySet() *QuerySet {
 	return &QuerySet{
-		Filters: []string{},
-		Set:     make(map[string]string),
+		filters: []string{},
+		set:     make(map[string]string),
 	}
 }
 
@@ -65,42 +65,42 @@ func (q *QuerySet) Clear() *QuerySet {
 }
 
 func (q *QuerySet) InsertTable(table string) *QuerySet {
-	q.Set[QINSERTTABLE] = fmt.Sprintf(" %s `%s` ", QINSERTTABLE[1:], table)
+	q.set[QINSERTTABLE] = fmt.Sprintf(" %s `%s` ", QINSERTTABLE[1:], table)
 	return q
 }
 
 func (q *QuerySet) InsertFields(fields string) *QuerySet {
-	q.Set[QINSERTFIELDS] = fmt.Sprintf(" (%s) ", fields)
+	q.set[QINSERTFIELDS] = fmt.Sprintf(" (%s) ", fields)
 	return q
 }
 
 func (q *QuerySet) InsertValues(values string) *QuerySet {
-	q.Set[QINSERTVALUES] = fmt.Sprintf(" %s %s ", QINSERTVALUES[1:], values)
+	q.set[QINSERTVALUES] = fmt.Sprintf(" %s %s ", QINSERTVALUES[1:], values)
 	return q
 }
 
 func (q *QuerySet) UpdateTable(table string) *QuerySet {
-	q.Set[QUPDATE] = fmt.Sprintf(" %s `%s` ", QUPDATE[1:], table)
+	q.set[QUPDATE] = fmt.Sprintf(" %s `%s` ", QUPDATE[1:], table)
 	return q
 }
 
 func (q *QuerySet) UpdateSet(values string) *QuerySet {
-	q.Set[QUPDATESET] = fmt.Sprintf(" %s %s ", QUPDATESET[1:], values)
+	q.set[QUPDATESET] = fmt.Sprintf(" %s %s ", QUPDATESET[1:], values)
 	return q
 }
 
 func (q *QuerySet) Delete() *QuerySet {
-	q.Set[QDELETE] = fmt.Sprintf(" %s ", QDELETE[1:])
+	q.set[QDELETE] = fmt.Sprintf(" %s ", QDELETE[1:])
 	return q
 }
 
 func (q *QuerySet) Select(fields string) *QuerySet {
-	q.Set[QSELECT] = fmt.Sprintf(" %s %s ", QSELECT[1:], fields)
+	q.set[QSELECT] = fmt.Sprintf(" %s %s ", QSELECT[1:], fields)
 	return q
 }
 
 func (q *QuerySet) From(table string) *QuerySet {
-	q.Set[QFROM] = fmt.Sprintf(" %s `%s` ", QFROM[1:], table)
+	q.set[QFROM] = fmt.Sprintf(" %s `%s` ", QFROM[1:], table)
 	return q
 }
 
@@ -110,7 +110,7 @@ func (q *QuerySet) Where(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" %s %s ", QWHERE[1:], name))
+	q.filters = append(q.filters, fmt.Sprintf(" %s %s ", QWHERE[1:], name))
 	return q
 }
 
@@ -120,7 +120,7 @@ func (q *QuerySet) And(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" %s %s ", QAND[1:], name))
+	q.filters = append(q.filters, fmt.Sprintf(" %s %s ", QAND[1:], name))
 	return q
 }
 
@@ -130,7 +130,7 @@ func (q *QuerySet) Or(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" %s %s ", QOR[1:], name))
+	q.filters = append(q.filters, fmt.Sprintf(" %s %s ", QOR[1:], name))
 	return q
 }
 
@@ -140,7 +140,7 @@ func (q *QuerySet) In(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" IN (%s) ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" IN (%s) ", name))
 	return q
 }
 
@@ -150,7 +150,7 @@ func (q *QuerySet) Eq(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" = \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" = \"%s\" ", name))
 	return q
 }
 
@@ -160,7 +160,7 @@ func (q *QuerySet) Neq(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" != \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" != \"%s\" ", name))
 	return q
 }
 
@@ -170,7 +170,7 @@ func (q *QuerySet) Gt(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" > \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" > \"%s\" ", name))
 	return q
 }
 
@@ -180,7 +180,7 @@ func (q *QuerySet) Ge(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" >= \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" >= \"%s\" ", name))
 	return q
 }
 
@@ -190,7 +190,7 @@ func (q *QuerySet) Lt(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" < \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" < \"%s\" ", name))
 	return q
 }
 
@@ -200,51 +200,51 @@ func (q *QuerySet) Le(name string) *QuerySet {
 		return q
 	}
 
-	q.Filters = append(q.Filters, fmt.Sprintf(" <= \"%s\" ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" <= \"%s\" ", name))
 	return q
 }
 
 func (q *QuerySet) Limit(offset, num uint64) *QuerySet {
-	q.Set[QLIMIT] = fmt.Sprintf(" %s %d,%d", QLIMIT[1:], offset, num)
+	q.set[QLIMIT] = fmt.Sprintf(" %s %d,%d", QLIMIT[1:], offset, num)
 	return q
 }
 
 func (q *QuerySet) LimitString(limit string) *QuerySet {
-	q.Set[QLIMIT] = fmt.Sprintf(" %s %s", QLIMIT[1:], limit)
+	q.set[QLIMIT] = fmt.Sprintf(" %s %s", QLIMIT[1:], limit)
 	return q
 }
 
-func (q *QuerySet) Sql() string {
+func (q *QuerySet) sql() string {
 
 	var (
 		sql     string
 		qss     = QScores{}
-		filters = strings.Join(q.Filters, " ")
+		filters = strings.Join(q.filters, " ")
 	)
 
-	for k, v := range q.Set {
+	for k, v := range q.set {
 
 		score, _ := strconv.Atoi(fmt.Sprintf("%d", k[0]))
 		qss = append(qss, QScore{
-			Score: score,
-			Value: v,
+			score: score,
+			value: v,
 		})
 	}
 
-	if q.Strip {
-		filters = strings.Replace(strings.Join(q.Filters, " "), "\"", "", -1)
+	if q.strip {
+		filters = strings.Replace(strings.Join(q.filters, " "), "\"", "", -1)
 	}
 
 	qss = append(qss, QScore{
-		Score: 0x35,
-		Value: filters,
+		score: 0x35,
+		value: filters,
 	})
 
 	sort.Sort(qss)
 
 	for _, v := range qss {
 
-		sql += v.Value
+		sql += v.value
 	}
 
 	return sql
