@@ -17,29 +17,29 @@ func TestMysqlSql(t *testing.T) {
 	// ==========================================================
 	qset.Clear().Select("*").From("test_temp").Where("id").Eq("30000").And("id").Gt("40000").Or("title").Neq("title_01").Limit(100, 20)
 
-	do_test(qneed, qset, t)
+	do_sql_test(qneed, qset, t)
 
 	// ==========================================================
 	qneed = strings.TrimSpace("INSERT INTO  `test_temp`  (title,content)  VALUES ('fdsfds','fdsfd'),('vvvvvv','ddddd')")
 
 	qset.Clear().InsertTable("test_temp").InsertFields("title,content").InsertValues("('fdsfds','fdsfd'),('vvvvvv','ddddd')")
-	do_test(qneed, qset, t)
+	do_sql_test(qneed, qset, t)
 
 	// ==========================================================
 	qneed = strings.TrimSpace("UPDATE  `test_temp`  SET title='fffff',content='ccccccccccccccccccc'  WHERE id   = \"30000\"   OR id   > \"100000\"")
 
 	qset.Clear().UpdateTable("test_temp").UpdateSet("title='fffff',content='ccccccccccccccccccc'").Where("id").Eq("30000").Or("id").Gt("100000")
-	do_test(qneed, qset, t)
+	do_sql_test(qneed, qset, t)
 
 	// ==========================================================
 	qneed = strings.TrimSpace("SELECT *  FROM `test_temp`  WHERE id   IN (31,32,33,100)")
 	qset.Clear().Select("*").From("test_temp").Where("id").In("31,32,33,100")
-	do_test(qneed, qset, t)
+	do_sql_test(qneed, qset, t)
 
 	// ==========================================================
 	qneed = strings.TrimSpace("DELETE  FROM `test_temp`  WHERE id   IN (31,32,33,500,1000)")
 	qset.Clear().Delete().From("test_temp").Where("id").In("31,32,33,500,1000")
-	do_test(qneed, qset, t)
+	do_sql_test(qneed, qset, t)
 
 }
 
@@ -67,26 +67,28 @@ func TestMysqlDB(t *testing.T) {
 		qset.Clear().InsertTable("test_temp").InsertFields("title,content").InsertValues("('title_01','value_01'),('title_02','value_02'),('title_03','content_03')")
 		if _, err = db.Exec(qset.sql()); err != nil {
 			t.Errorf("db.Exec err:%v", err)
+			break
 		}
 	}
 
-	t.Logf("sql:%s\n", qset.sql())
+	// t.Logf("sql:%s\n", qset.sql())
 
 	qset.Clear().Select("*").From("test_temp").Where("id").In("?,?,?")
 
-	t.Logf("sql:%s\n", qset.sql())
+	// t.Logf("sql:%s\n", qset.sql())
 
 	for i := 0; i < 100; i++ {
 
 		if _, err := db.PrepareQuery(qset, 1, 2, 3); err != nil {
 			t.Errorf("db.PrepareQuery rst:%v err:%v", err)
+			break
 		}
 	}
 
 	db.PrepareClose(qset)
 }
 
-func do_test(qneed string, q *QuerySet, t *testing.T) {
+func do_sql_test(qneed string, q *QuerySet, t *testing.T) {
 
 	pass := true
 	qneed = strings.TrimSpace(qneed)
@@ -96,6 +98,7 @@ func do_test(qneed string, q *QuerySet, t *testing.T) {
 		if strings.TrimSpace(q.sql()) != qneed {
 			pass = false
 			t.Errorf("Sql not matched. sql:%s", q.sql())
+			break
 		}
 	}
 
