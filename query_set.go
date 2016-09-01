@@ -46,6 +46,8 @@ func (s QScores) Swap(i, j int) {
 
 type QuerySet struct {
 	Stmt    *sql.Stmt
+	Tx      *sql.Tx
+	Strip   bool
 	Filters []string
 	Set     map[string]string
 }
@@ -212,7 +214,7 @@ func (q *QuerySet) LimitString(limit string) *QuerySet {
 	return q
 }
 
-func (q *QuerySet) Sql(strip bool) string {
+func (q *QuerySet) Sql() string {
 
 	var (
 		sql     string
@@ -229,7 +231,7 @@ func (q *QuerySet) Sql(strip bool) string {
 		})
 	}
 
-	if strip {
+	if q.Strip {
 		filters = strings.Replace(strings.Join(q.Filters, " "), "\"", "", -1)
 	}
 

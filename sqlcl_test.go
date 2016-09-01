@@ -27,7 +27,7 @@ func TestSqlite3(t *testing.T) {
 	if err != nil {
 		t.Fatalf("#001  err:%v\n", err)
 	}
-	t.Logf("#001 sql:%s  err:%v\n", qset.Sql(true), err)
+	t.Logf("#001 sql:%s  err:%v\n", qset.Sql(), err)
 
 	for i := 0; i < 1000; i++ {
 
@@ -76,3 +76,17 @@ func TestSqlite3(t *testing.T) {
 
 	// t.Logf("#004 rs:%v err:%v", rs, err)
 }
+
+/*
+func TestSqlite3Tx(t *testing.T) {
+
+	db, err := New(Config{
+		Driver: "sqlite3",
+		Addr:   ":memory:",
+	})
+	if err != nil {
+		t.Fatalf("db conn err:%s", err.Error())
+	}
+	defer db.Close()
+}
+*/
