@@ -23,7 +23,7 @@ type Config struct {
 }
 
 type Server struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 type RowColumn map[string]string
@@ -51,21 +51,21 @@ func New(c Config) (*Server, error) {
 		return nil, fmt.Errorf("Unknow db driver:%s", c.Driver)
 	}
 
-	db, err := sql.Open(c.Driver, dsn)
+	db_link, err := sql.Open(c.Driver, dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Server{DB: db}, nil
+	return &Server{db: db_link}, nil
 }
 
 func (s *Server) Close() error {
-	return s.DB.Close()
+	return s.db.Close()
 }
 
 func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
-	rows, err := s.DB.Query(q.sql(), args...)
+	rows, err := s.db.Query(q.sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
 func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) {
 
-	rows, err := s.DB.Query(q.sql(), args...)
+	rows, err := s.db.Query(q.sql(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (s *Server) Prepare(q *QuerySet) error {
 	q.strip = true
 
 	var err error
-	q.stmt, err = s.DB.Prepare(q.sql())
+	q.stmt, err = s.db.Prepare(q.sql())
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error)
 		q.strip = true
 
 		var err error
-		q.stmt, err = s.DB.Prepare(q.sql())
+		q.stmt, err = s.db.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
@@ -143,7 +143,7 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 		q.strip = true
 
 		var err error
-		q.stmt, err = s.DB.Prepare(q.sql())
+		q.stmt, err = s.db.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +179,7 @@ func (s *Server) PrepareExec(q *QuerySet, args ...interface{}) (sql.Result, erro
 		q.strip = true
 
 		var err error
-		q.stmt, err = s.DB.Prepare(q.sql())
+		q.stmt, err = s.db.Prepare(q.sql())
 		if err != nil {
 			return nil, err
 		}
@@ -197,13 +197,13 @@ func (s *Server) PrepareClose(q *QuerySet) {
 }
 
 func (s *Server) Exec(q string) (sql.Result, error) {
-	return s.DB.Exec(q)
+	return s.db.Exec(q)
 }
 
 func (s *Server) TxBegin(q *QuerySet) error {
 
 	var err error
-	q.tx, err = s.DB.Begin()
+	q.tx, err = s.db.Begin()
 	if err != nil {
 		return err
 	}

@@ -27,25 +27,6 @@ const (
 	QLIMIT        = "6LIMIT"
 )
 
-type QScore struct {
-	score int
-	value string
-}
-
-type QScores []QScore
-
-func (s QScores) Len() int {
-	return len(s)
-}
-
-func (s QScores) Less(i, j int) bool {
-	return s[i].score < s[j].score
-}
-
-func (s QScores) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
 type QuerySet struct {
 	stmt    *sql.Stmt
 	tx      *sql.Tx
@@ -220,14 +201,14 @@ func (q *QuerySet) sql() string {
 
 	var (
 		sql     string
-		qss     = QScores{}
+		qss     = qscores{}
 		filters = strings.Join(q.filters, " ")
 	)
 
 	for k, v := range q.set {
 
 		score, _ := strconv.Atoi(fmt.Sprintf("%d", k[0]))
-		qss = append(qss, QScore{
+		qss = append(qss, qscore{
 			score: score,
 			value: v,
 		})
@@ -237,7 +218,7 @@ func (q *QuerySet) sql() string {
 		filters = strings.Replace(strings.Join(q.filters, " "), "\"", "", -1)
 	}
 
-	qss = append(qss, QScore{
+	qss = append(qss, qscore{
 		score: 0x35,
 		value: filters,
 	})
@@ -250,4 +231,23 @@ func (q *QuerySet) sql() string {
 	}
 
 	return sql
+}
+
+type qscore struct {
+	score int
+	value string
+}
+
+type qscores []qscore
+
+func (s qscores) Len() int {
+	return len(s)
+}
+
+func (s qscores) Less(i, j int) bool {
+	return s[i].score < s[j].score
+}
+
+func (s qscores) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
