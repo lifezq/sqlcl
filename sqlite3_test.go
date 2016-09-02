@@ -116,31 +116,35 @@ func TestSqlite3Tx(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 
-		// exec_rst, err := db.TxStmtExec(qset, fmt.Sprintf("#%d_test_value", i))
-		_, err := db.TxStmtExec(qset, fmt.Sprintf("#%d_test_value", i))
+		exec_rst, err := db.TxStmtExec(qset, fmt.Sprintf("#%d_tx_test_value", i))
 		if err != nil {
 			t.Errorf("Tx.db.TxStmtExec err:%s\n", err.Error())
 			break
 		}
 
-		// lid, err := exec_rst.LastInsertId()
-		// if err != nil {
-		//	t.Errorf("Tx.exec_rst.LastInsertId err:%s\n", err.Error())
-		//	break
-		// }
+		_, err = exec_rst.LastInsertId()
+		if err != nil {
+			t.Errorf("Tx.exec_rst.LastInsertId err:%s\n", err.Error())
+			break
+		}
 
-		// aft, err := exec_rst.RowsAffected()
-		// if err != nil {
-		// 	t.Errorf("Tx.exec_rst.RowsAffected err:%s\n", err.Error())
-		// 	break
-		// }
+		_, err = exec_rst.RowsAffected()
+		if err != nil {
+			t.Errorf("Tx.exec_rst.RowsAffected err:%s\n", err.Error())
+			break
+		}
 
 		// t.Logf("Tx.db.TxStmtExec lid:%d aft:%d\n", lid, aft)
 	}
 
-	// if err = db.TxRollBack(qset); err != nil {
-	//	t.Fatalf("Tx.db.TxRollBack err:%s\n", err.Error())
-	// }
+	if tx_rollback() {
+
+		if err = db.TxRollBack(qset); err != nil {
+			t.Fatalf("Tx.db.TxRollBack err:%s\n", err.Error())
+		}
+
+		t.Fatalf("Exit Info Tx.RollBack Args Is Specified")
+	}
 
 	if err = db.TxCommit(qset); err != nil {
 		t.Fatalf("Tx.db.TxCommit err:%s\n", err.Error())

@@ -5,6 +5,8 @@
 package sqlcl
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"testing"
 )
@@ -88,21 +90,77 @@ func TestMysqlDB(t *testing.T) {
 	}
 
 	db.PrepareClose(qset)
+
+	// Tx
+	if err := db.TxBegin(qset.Clear()); err != nil {
+		t.Fatalf("db.TxBegin err:%s", err.Error())
+	}
+
+	if err := db.TxPrepare(qset.InsertTable("test_temp").InsertFields("title,content").InsertValues("(?,?)")); err != nil {
+		t.Fatalf("db.TxPrepare err:%s", err.Error())
+	}
+
+	for i := 0; i < 100; i++ {
+
+		rst, err := db.TxStmtExec(qset, fmt.Sprintf("#%d_tx_test_title", i), fmt.Sprintf("#%d_tx_test_content", i))
+		if err != nil {
+			t.Fatalf("db.TxStmtExec err:%s", err.Error())
+		}
+
+		_, err = rst.LastInsertId()
+		if err != nil {
+			t.Fatalf("rst.LastInsertId err:%s", err.Error())
+		}
+
+		_, err = rst.RowsAffected()
+		if err != nil {
+			t.Fatalf("rst.RowsAffected err:%s", err.Error())
+		}
+
+		// t.Logf("db.Tx lid:%d aft:%d\n", lid, aft)
+	}
+
+	if tx_rollback() {
+
+		if err := db.TxRollBack(qset); err != nil {
+			t.Fatalf("db.TxRollBack err:%s", err.Error())
+		}
+
+		t.Fatalf("Exit Info Tx.RollBack Args Is Specified")
+	}
+
+	if err := db.TxCommit(qset); err != nil {
+		t.Fatalf("db.TxCommit err:%s", err.Error())
+	}
+
+	db.PrepareClose(qset)
 }
 
 func do_sql_test(qneed string, q *QuerySet, t *testing.T) {
 
-	pass := true
+	//	pass := true
 	qneed = strings.TrimSpace(qneed)
 
 	for i := 0; i < 1000; i++ {
 
 		if strings.TrimSpace(q.sql()) != qneed {
-			pass = false
+			//			pass = false
 			t.Errorf("Sql not matched. sql:%s", q.sql())
 			break
 		}
 	}
 
-	t.Logf("pass:%v sql:%s\n", pass, qneed)
+	//	t.Logf("pass:%v sql:%s\n", pass, qneed)
+}
+
+func tx_rollback() bool {
+
+	for i := 1; i < len(os.Args); i++ {
+
+		if os.Args[i] == "rollback" {
+			return true
+		}
+	}
+
+	return false
 }
