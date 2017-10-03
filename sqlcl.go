@@ -7,19 +7,23 @@ package sqlcl
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Config struct {
-	Driver   string // mysql/sqlite3
-	Addr     string // mysql:127.0.0.1:3306/sqlite3:/tmp/foo.db or :memory:
-	User     string
-	Pass     string
-	DbName   string
-	Protocol string
-	Params   string
+	Driver      string // mysql/sqlite3
+	Addr        string // mysql:127.0.0.1:3306/sqlite3:/tmp/foo.db or :memory:
+	User        string
+	Pass        string
+	DbName      string
+	Protocol    string
+	Params      string
+	MaxLifetime time.Duration
+	MaxIdleConn int
+	MaxConn     int
 }
 
 type Server struct {
@@ -64,11 +68,19 @@ func New(c Config) (*Server, error) {
 		return nil, err
 	}
 
+	db_link.SetConnMaxLifetime(c.MaxLifetime)
+	db_link.SetMaxIdleConns(c.MaxIdleConn)
+	db_link.SetMaxOpenConns(c.MaxConn)
+
 	return &Server{db: db_link}, nil
 }
 
 func (s *Server) Close() error {
 	return s.db.Close()
+}
+
+func (s *Server) Ping() error {
+	return s.db.Ping()
 }
 
 func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
