@@ -33,7 +33,7 @@ type Server struct {
 type RowColumn map[string]string
 
 type Result struct {
-	Data []RowColumn
+	Data []*RowColumn
 }
 
 func (r *RowColumn) Get(k string) string {
@@ -109,7 +109,7 @@ func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) 
 		return nil, fmt.Errorf("Not Found")
 	}
 
-	return &rst.Data[0], err
+	return rst.Data[0], err
 }
 
 func (s *Server) Prepare(q *QuerySet) error {
@@ -179,7 +179,7 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 		return nil, fmt.Errorf("Not Found")
 	}
 
-	return &rst.Data[0], nil
+	return rst.Data[0], nil
 }
 
 func (s *Server) PrepareExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
@@ -284,7 +284,7 @@ func (s *Server) TxQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error
 		return nil, fmt.Errorf("Not Found")
 	}
 
-	return &rst.Data[0], err
+	return rst.Data[0], err
 }
 
 func (s *Server) TxRollBack(q *QuerySet) error {
@@ -330,7 +330,7 @@ func (s *Server) TxStmtQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, e
 		return nil, fmt.Errorf("Not Found")
 	}
 
-	return &rst.Data[0], err
+	return rst.Data[0], err
 }
 
 func (s *Server) TxStmtExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
@@ -367,7 +367,7 @@ func parseRows(rows *sql.Rows) (*Result, error) {
 			continue
 		}
 
-		rdt := RowColumn{}
+		rdt := &RowColumn{}
 
 		for i, col := range values {
 
@@ -377,7 +377,7 @@ func parseRows(rows *sql.Rows) (*Result, error) {
 				value = string(col)
 			}
 
-			rdt[columes[i]] = value
+			(*rdt)[columes[i]] = value
 		}
 
 		rst.Data = append(rst.Data, rdt)
