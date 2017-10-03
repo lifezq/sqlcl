@@ -32,6 +32,14 @@ type Result struct {
 	Data []RowColumn
 }
 
+func (r *RowColumn) Get(k string) string {
+
+	if v, ok := (*r)[k]; ok {
+		return v
+	}
+	return ""
+}
+
 func New(c Config) (*Server, error) {
 
 	dsn := ""
