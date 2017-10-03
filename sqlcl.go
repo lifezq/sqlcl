@@ -216,8 +216,8 @@ func (s *Server) PrepareClose(q *QuerySet) {
 	}
 }
 
-func (s *Server) Exec(q string) (sql.Result, error) {
-	return s.db.Exec(q)
+func (s *Server) Exec(q *QuerySet) (sql.Result, error) {
+	return s.db.Exec(q.sql())
 }
 
 func (s *Server) TxBegin(q *QuerySet) error {
