@@ -30,7 +30,6 @@ const (
 type QuerySet struct {
 	stmt    *sql.Stmt
 	tx      *sql.Tx
-	strip   bool
 	filters []string
 	set     map[string]string
 }
@@ -202,7 +201,7 @@ func (q *QuerySet) sql() string {
 	var (
 		sql     string
 		qss     = qscores{}
-		filters = strings.Join(q.filters, " ")
+		filters = strings.Replace(strings.Join(q.filters, " "), "\"?\"", "?", -1)
 	)
 
 	for k, v := range q.set {
@@ -212,10 +211,6 @@ func (q *QuerySet) sql() string {
 			score: score,
 			value: v,
 		})
-	}
-
-	if q.strip {
-		filters = strings.Replace(strings.Join(q.filters, " "), "\"", "", -1)
 	}
 
 	qss = append(qss, qscore{

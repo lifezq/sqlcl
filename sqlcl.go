@@ -114,8 +114,6 @@ func (s *Server) QueryRow(q *QuerySet, args ...interface{}) (*RowColumn, error) 
 
 func (s *Server) Prepare(q *QuerySet) error {
 
-	q.strip = true
-
 	var err error
 	q.stmt, err = s.db.Prepare(q.sql())
 	if err != nil {
@@ -132,8 +130,6 @@ func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error)
 	}
 
 	if q.stmt == nil {
-
-		q.strip = true
 
 		var err error
 		q.stmt, err = s.db.Prepare(q.sql())
@@ -159,8 +155,6 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 	}
 
 	if q.stmt == nil {
-
-		q.strip = true
 
 		var err error
 		q.stmt, err = s.db.Prepare(q.sql())
@@ -195,8 +189,6 @@ func (s *Server) PrepareExec(q *QuerySet, args ...interface{}) (sql.Result, erro
 	}
 
 	if q.stmt == nil {
-
-		q.strip = true
 
 		var err error
 		q.stmt, err = s.db.Prepare(q.sql())
@@ -254,8 +246,6 @@ func (s *Server) TxPrepare(q *QuerySet) error {
 	if q.tx == nil {
 		return fmt.Errorf("Client Error")
 	}
-
-	q.strip = true
 
 	var err error
 	q.stmt, err = q.tx.Prepare(q.sql())
