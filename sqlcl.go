@@ -7,6 +7,7 @@ package sqlcl
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -42,6 +43,26 @@ func (r *RowColumn) Get(k string) string {
 		return v
 	}
 	return ""
+}
+
+func (r *RowColumn) Int(k string) int {
+	i, _ := strconv.Atoi(r.Get(k))
+	return i
+}
+
+func (r *RowColumn) Int64(k string) int64 {
+	i, _ := strconv.ParseInt(r.Get(k), 10, 64)
+	return i
+}
+
+func (r *RowColumn) Uint64(k string) uint64 {
+	i, _ := strconv.ParseUint(r.Get(k), 10, 64)
+	return i
+}
+
+func (r *RowColumn) Float64(k string) float64 {
+	i, _ := strconv.ParseFloat(r.Get(k), 64)
+	return i
 }
 
 func New(c Config) (*Server, error) {
