@@ -104,6 +104,16 @@ func (s *Server) Ping() error {
 	return s.db.Ping()
 }
 
+func (s *Server) QueryString(sql string) (*Result, error) {
+
+	rows, err := s.db.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	return parseRows(rows)
+}
+
 func (s *Server) Query(q *QuerySet, args ...interface{}) (*Result, error) {
 
 	rows, err := s.db.Query(q.sql(), args...)
@@ -231,6 +241,10 @@ func (s *Server) PrepareClose(q *QuerySet) {
 
 func (s *Server) Exec(q *QuerySet) (sql.Result, error) {
 	return s.db.Exec(q.sql())
+}
+
+func (s *Server) ExecString(sql string) (sql.Result, error) {
+	return s.db.Exec(sql)
 }
 
 func (s *Server) TxBegin(q *QuerySet) error {
