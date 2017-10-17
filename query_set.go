@@ -186,6 +186,16 @@ func (q *QuerySet) Le(name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) Like(name string) *QuerySet {
+
+	if strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" LIKE \"%s\" ", name))
+	return q
+}
+
 func (q *QuerySet) Limit(offset, num uint64) *QuerySet {
 	q.set[QLIMIT] = fmt.Sprintf(" %s %d,%d", QLIMIT[1:], offset, num)
 	return q
