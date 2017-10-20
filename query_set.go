@@ -24,7 +24,10 @@ const (
 	QWHERE        = "3WHERE"
 	QAND          = "4AND"
 	QOR           = "4OR"
-	QLIMIT        = "6LIMIT"
+	QGROUPBY      = "5GROUP BY"
+	QHAVING       = "6HAVING"
+	QORDERBY      = "7ORDER BY"
+	QLIMIT        = "8LIMIT"
 )
 
 type QuerySet struct {
@@ -193,6 +196,21 @@ func (q *QuerySet) Like(name string) *QuerySet {
 	}
 
 	q.filters = append(q.filters, fmt.Sprintf(" LIKE \"%s\" ", name))
+	return q
+}
+
+func (q *QuerySet) GroupBy(name string) *QuerySet {
+	q.set[QGROUPBY] = fmt.Sprintf(" %s %s", QGROUPBY[1:], name)
+	return q
+}
+
+func (q *QuerySet) Having(name string) *QuerySet {
+	q.set[QHAVING] = fmt.Sprintf(" %s %s", QHAVING[1:], name)
+	return q
+}
+
+func (q *QuerySet) OrderBy(name string) *QuerySet {
+	q.set[QORDERBY] = fmt.Sprintf(" %s %s", QORDERBY[1:], name)
 	return q
 }
 
