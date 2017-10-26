@@ -22,8 +22,11 @@ const (
 	QSELECT       = "0SELECT"
 	QFROM         = "1FROM"
 	QWHERE        = "3WHERE"
+	QWHEREFISET   = "3WHERE FIND_IN_SET"
 	QAND          = "4AND"
+	QANDFISET     = "4AND FIND_IN_SET"
 	QOR           = "4OR"
+	QORFISET      = "4OR FIND_IN_SET"
 	QGROUPBY      = "5GROUP BY"
 	QHAVING       = "6HAVING"
 	QORDERBY      = "7ORDER BY"
@@ -99,6 +102,16 @@ func (q *QuerySet) Where(name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) WhereFindInSet(value, name string) *QuerySet {
+
+	if strings.ContainsAny(value, "=><") || strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" %s(\"%s\", %s) ", QWHEREFISET[1:], value, name))
+	return q
+}
+
 func (q *QuerySet) And(name string) *QuerySet {
 
 	if strings.ContainsAny(name, "=><") {
@@ -109,6 +122,16 @@ func (q *QuerySet) And(name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) AndFindInSet(value, name string) *QuerySet {
+
+	if strings.ContainsAny(value, "=><") || strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" %s(\"%s\", %s) ", QANDFISET[1:], value, name))
+	return q
+}
+
 func (q *QuerySet) Or(name string) *QuerySet {
 
 	if strings.ContainsAny(name, "=><") {
@@ -116,6 +139,16 @@ func (q *QuerySet) Or(name string) *QuerySet {
 	}
 
 	q.filters = append(q.filters, fmt.Sprintf(" %s %s ", QOR[1:], name))
+	return q
+}
+
+func (q *QuerySet) OrFindInSet(value, name string) *QuerySet {
+
+	if strings.ContainsAny(value, "=><") || strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" %s(\"%s\", %s) ", QORFISET[1:], value, name))
 	return q
 }
 
