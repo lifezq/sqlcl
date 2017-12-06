@@ -288,6 +288,15 @@ func (s *Server) TxPrepare(q *QuerySet) error {
 	return err
 }
 
+func (s *Server) TxPrepareClose(q *QuerySet) error {
+
+	if q.tx == nil || q.stmt == nil {
+		return fmt.Errorf("Client Error")
+	}
+
+	return q.stmt.Close()
+}
+
 func (s *Server) TxQuery(q *QuerySet, args ...interface{}) (*Result, error) {
 
 	if q.tx == nil {

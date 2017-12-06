@@ -52,6 +52,12 @@ func (q *QuerySet) Clear() *QuerySet {
 	return q
 }
 
+func (q *QuerySet) EmptySetFilters() *QuerySet {
+	q.set = make(map[string]string)
+	q.filters = []string{}
+	return q
+}
+
 func (q *QuerySet) InsertTable(table string) *QuerySet {
 	q.set[QINSERTTABLE] = fmt.Sprintf(" %s `%s` ", QINSERTTABLE[1:], table)
 	return q
