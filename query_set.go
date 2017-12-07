@@ -164,7 +164,7 @@ func (q *QuerySet) In(name string) *QuerySet {
 		return q
 	}
 
-	q.filters = append(q.filters, fmt.Sprintf(" IN (%s) ", name))
+	q.filters = append(q.filters, fmt.Sprintf(" IN (%s) ", strings.Trim(name, ",")))
 	return q
 }
 
