@@ -21,6 +21,7 @@ const (
 	QDELETE       = "0DELETE"
 	QSELECT       = "0SELECT"
 	QFROM         = "1FROM"
+	QINNERJOIN    = "2INNER JOIN"
 	QWHERE        = "3WHERE"
 	QWHEREFISET   = "3WHERE FIND_IN_SET"
 	QAND          = "4AND"
@@ -95,6 +96,16 @@ func (q *QuerySet) Select(fields string) *QuerySet {
 
 func (q *QuerySet) From(table string) *QuerySet {
 	q.set[QFROM] = fmt.Sprintf(" %s `%s` ", QFROM[1:], table)
+	return q
+}
+
+func (q *QuerySet) FromAs(table string, as string) *QuerySet {
+	q.set[QFROM] = fmt.Sprintf(" %s `%s`  AS %s ", QFROM[1:], table, as)
+	return q
+}
+
+func (q *QuerySet) InnerJoinAs(table string, as string) *QuerySet {
+	q.set[QINNERJOIN] = fmt.Sprintf(" %s `%s` AS %s ", QINNERJOIN[1:], table, as)
 	return q
 }
 
@@ -175,6 +186,16 @@ func (q *QuerySet) Eq(name string) *QuerySet {
 	}
 
 	q.filters = append(q.filters, fmt.Sprintf(" = \"%s\" ", name))
+	return q
+}
+
+func (q *QuerySet) EqNative(name string) *QuerySet {
+
+	if strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" =%s ", name))
 	return q
 }
 

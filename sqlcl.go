@@ -50,6 +50,11 @@ func (r *RowColumn) Int(k string) int {
 	return i
 }
 
+func (r *RowColumn) Int32(k string) int32 {
+	i, _ := strconv.ParseInt(r.Get(k), 10, 32)
+	return int32(i)
+}
+
 func (r *RowColumn) Int64(k string) int64 {
 	i, _ := strconv.ParseInt(r.Get(k), 10, 64)
 	return i
