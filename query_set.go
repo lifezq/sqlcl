@@ -49,13 +49,15 @@ func NewQuerySet() *QuerySet {
 }
 
 func (q *QuerySet) Clear() *QuerySet {
-	*q = *NewQuerySet()
-	return q
-}
 
-func (q *QuerySet) EmptySetFilters() *QuerySet {
 	q.set = make(map[string]string)
 	q.filters = []string{}
+
+	if q.stmt != nil {
+		q.stmt.Close()
+		q.stmt = nil
+	}
+
 	return q
 }
 

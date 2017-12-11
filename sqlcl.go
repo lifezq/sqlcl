@@ -176,7 +176,6 @@ func (s *Server) PrepareQuery(q *QuerySet, args ...interface{}) (*Result, error)
 	}
 
 	rows, err := q.stmt.Query(args...)
-	// defer q.stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +200,6 @@ func (s *Server) PrepareQueryRow(q *QuerySet, args ...interface{}) (*RowColumn, 
 	}
 
 	rows, err := q.stmt.Query(args...)
-	//	defer q.stmt.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -241,6 +239,7 @@ func (s *Server) PrepareClose(q *QuerySet) {
 
 	if q.stmt != nil {
 		q.stmt.Close()
+		q.stmt = nil
 	}
 }
 
@@ -299,7 +298,9 @@ func (s *Server) TxPrepareClose(q *QuerySet) error {
 		return fmt.Errorf("Client Error")
 	}
 
-	return q.stmt.Close()
+	err := q.stmt.Close()
+	q.stmt = nil
+	return err
 }
 
 func (s *Server) TxQuery(q *QuerySet, args ...interface{}) (*Result, error) {
