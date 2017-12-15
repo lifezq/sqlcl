@@ -21,7 +21,7 @@ func TestSqlite3(t *testing.T) {
 	}
 	defer db.Close()
 
-	rs, err := db.Exec("create temporary table if not exists foo(id integer not null primary key autoincrement, name text)")
+	rs, err := db.ExecString("create temporary table if not exists foo(id integer not null primary key autoincrement, name text)")
 	if err != nil {
 		t.Fatalf("#000 rs:%v err:%v\n", rs, err)
 	}
@@ -97,7 +97,7 @@ func TestSqlite3Tx(t *testing.T) {
 	}
 	defer db.Close()
 
-	rs, err := db.Exec("create temporary table if not exists foo(id integer not null primary key autoincrement, name text)")
+	rs, err := db.ExecString("create temporary table if not exists foo(id integer not null primary key autoincrement, name text)")
 	if err != nil {
 		t.Fatalf("Tx.#000 rs:%v err:%v\n", rs, err)
 	}

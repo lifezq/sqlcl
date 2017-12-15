@@ -65,6 +65,11 @@ func (r *RowColumn) Uint64(k string) uint64 {
 	return i
 }
 
+func (r *RowColumn) Float32(k string) float32 {
+	i, _ := strconv.ParseFloat(r.Get(k), 32)
+	return float32(i)
+}
+
 func (r *RowColumn) Float64(k string) float64 {
 	i, _ := strconv.ParseFloat(r.Get(k), 64)
 	return i
@@ -290,6 +295,24 @@ func (s *Server) TxPrepare(q *QuerySet) error {
 	q.stmt, err = q.tx.Prepare(q.sql())
 
 	return err
+}
+
+func (s *Server) TxPrepareExec(q *QuerySet, args ...interface{}) (sql.Result, error) {
+
+	if q.tx == nil {
+		return nil, fmt.Errorf("Client Error")
+	}
+
+	if q.stmt == nil {
+
+		var err error
+		q.stmt, err = q.tx.Prepare(q.sql())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return q.tx.Stmt(q.stmt).Exec(args...)
 }
 
 func (s *Server) TxPrepareClose(q *QuerySet) error {
