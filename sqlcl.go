@@ -45,6 +45,22 @@ func (r *RowColumn) Get(k string) string {
 	return ""
 }
 
+func (r *RowColumn) Int8(k string) int8 {
+	return int8(r.Int(k))
+}
+
+func (r *RowColumn) Uint8(k string) uint8 {
+	return uint8(r.Int8(k))
+}
+
+func (r *RowColumn) Int16(k string) int16 {
+	return int16(r.Int(k))
+}
+
+func (r *RowColumn) Uint16(k string) uint16 {
+	return uint16(r.Int16(k))
+}
+
 func (r *RowColumn) Int(k string) int {
 	i, _ := strconv.Atoi(r.Get(k))
 	return i
@@ -53,6 +69,11 @@ func (r *RowColumn) Int(k string) int {
 func (r *RowColumn) Int32(k string) int32 {
 	i, _ := strconv.ParseInt(r.Get(k), 10, 32)
 	return int32(i)
+}
+
+func (r *RowColumn) Uint32(k string) uint32 {
+	i, _ := strconv.ParseInt(r.Get(k), 10, 64)
+	return uint32(i)
 }
 
 func (r *RowColumn) Int64(k string) int64 {
