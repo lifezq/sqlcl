@@ -50,7 +50,7 @@ func (r *RowColumn) Int8(k string) int8 {
 }
 
 func (r *RowColumn) Uint8(k string) uint8 {
-	return uint8(r.Int8(k))
+	return uint8(r.Int(k))
 }
 
 func (r *RowColumn) Int16(k string) int16 {
@@ -58,7 +58,7 @@ func (r *RowColumn) Int16(k string) int16 {
 }
 
 func (r *RowColumn) Uint16(k string) uint16 {
-	return uint16(r.Int16(k))
+	return uint16(r.Int(k))
 }
 
 func (r *RowColumn) Int(k string) int {
