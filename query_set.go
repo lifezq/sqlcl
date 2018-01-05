@@ -28,10 +28,10 @@ const (
 	QANDFISET     = "4AND FIND_IN_SET"
 	QOR           = "4OR"
 	QORFISET      = "4OR FIND_IN_SET"
-	QGROUPBY      = "5GROUP BY"
-	QHAVING       = "6HAVING"
-	QORDERBY      = "7ORDER BY"
-	QLIMIT        = "8LIMIT"
+	QGROUPBY      = "6GROUP BY"
+	QHAVING       = "7HAVING"
+	QORDERBY      = "8ORDER BY"
+	QLIMIT        = "9LIMIT"
 )
 
 type QuerySet struct {
