@@ -181,6 +181,16 @@ func (q *QuerySet) In(name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) NotIn(name string) *QuerySet {
+
+	if strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" NOT IN (%s) ", strings.Trim(name, ",")))
+	return q
+}
+
 func (q *QuerySet) Eq(name string) *QuerySet {
 
 	if strings.ContainsAny(name, "=><") {
