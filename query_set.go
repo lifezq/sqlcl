@@ -221,6 +221,16 @@ func (q *QuerySet) Neq(name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) NeqNative(name string) *QuerySet {
+
+	if strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" !=%s ", name))
+	return q
+}
+
 func (q *QuerySet) Gt(name string) *QuerySet {
 
 	if strings.ContainsAny(name, "=><") {
@@ -325,6 +335,7 @@ func (q *QuerySet) sql() string {
 		sql += v.value
 	}
 
+	// fmt.Printf("sql:%s\n", sql)
 	return sql
 }
 
