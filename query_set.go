@@ -151,6 +151,16 @@ func (q *QuerySet) AndFindInSet(value, name string) *QuerySet {
 	return q
 }
 
+func (q *QuerySet) AndFindInSetWithLeftBracket(value, name string) *QuerySet {
+
+	if strings.ContainsAny(value, "=><") || strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" AND (FIND_IN_SET(\"%s\", %s) ", value, name))
+	return q
+}
+
 func (q *QuerySet) Or(name string) *QuerySet {
 
 	if strings.ContainsAny(name, "=><") {
@@ -168,6 +178,16 @@ func (q *QuerySet) OrFindInSet(value, name string) *QuerySet {
 	}
 
 	q.filters = append(q.filters, fmt.Sprintf(" %s(\"%s\", %s) ", QORFISET[1:], value, name))
+	return q
+}
+
+func (q *QuerySet) OrFindInSetWithRightBracket(value, name string) *QuerySet {
+
+	if strings.ContainsAny(value, "=><") || strings.ContainsAny(name, "=><") {
+		return q
+	}
+
+	q.filters = append(q.filters, fmt.Sprintf(" %s(\"%s\", %s)) ", QORFISET[1:], value, name))
 	return q
 }
 

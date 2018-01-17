@@ -38,6 +38,9 @@ type Result struct {
 }
 
 func (r *RowColumn) Get(k string) string {
+	if r == nil {
+		return ""
+	}
 
 	if v, ok := (*r)[k]; ok {
 		return v
@@ -46,52 +49,85 @@ func (r *RowColumn) Get(k string) string {
 }
 
 func (r *RowColumn) Int8(k string) int8 {
+	if r == nil {
+		return 0
+	}
 	return int8(r.Int(k))
 }
 
 func (r *RowColumn) Uint8(k string) uint8 {
+	if r == nil {
+		return 0
+	}
 	return uint8(r.Int(k))
 }
 
 func (r *RowColumn) Int16(k string) int16 {
+	if r == nil {
+		return 0
+	}
 	return int16(r.Int(k))
 }
 
 func (r *RowColumn) Uint16(k string) uint16 {
+	if r == nil {
+		return 0
+	}
 	return uint16(r.Int(k))
 }
 
 func (r *RowColumn) Int(k string) int {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.Atoi(r.Get(k))
 	return i
 }
 
 func (r *RowColumn) Int32(k string) int32 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseInt(r.Get(k), 10, 32)
 	return int32(i)
 }
 
 func (r *RowColumn) Uint32(k string) uint32 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseInt(r.Get(k), 10, 64)
 	return uint32(i)
 }
 
 func (r *RowColumn) Int64(k string) int64 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseInt(r.Get(k), 10, 64)
 	return i
 }
 
 func (r *RowColumn) Uint64(k string) uint64 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseUint(r.Get(k), 10, 64)
 	return i
 }
 
 func (r *RowColumn) Float32(k string) float32 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseFloat(r.Get(k), 32)
 	return float32(i)
 }
 
 func (r *RowColumn) Float64(k string) float64 {
+	if r == nil {
+		return 0
+	}
 	i, _ := strconv.ParseFloat(r.Get(k), 64)
 	return i
 }
