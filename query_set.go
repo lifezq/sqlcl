@@ -22,6 +22,7 @@ const (
 	QSELECT       = "0SELECT"
 	QFROM         = "1FROM"
 	QINNERJOIN    = "2INNER JOIN"
+	QLEFTJOIN     = "2LEFT JOIN"
 	QWHERE        = "3WHERE"
 	QWHEREFISET   = "3WHERE FIND_IN_SET"
 	QAND          = "4AND"
@@ -101,13 +102,18 @@ func (q *QuerySet) From(table string) *QuerySet {
 	return q
 }
 
-func (q *QuerySet) FromAs(table string, as string) *QuerySet {
+func (q *QuerySet) FromAs(table, as string) *QuerySet {
 	q.set[QFROM] = fmt.Sprintf(" %s `%s`  AS %s ", QFROM[1:], table, as)
 	return q
 }
 
-func (q *QuerySet) InnerJoinAs(table string, as string) *QuerySet {
-	q.set[QINNERJOIN] = fmt.Sprintf(" %s `%s` AS %s ", QINNERJOIN[1:], table, as)
+func (q *QuerySet) InnerJoinAsOn(table, as, on string) *QuerySet {
+	q.set[QINNERJOIN] = fmt.Sprintf(" %s `%s` AS %s ON %s ", QINNERJOIN[1:], table, as, on)
+	return q
+}
+
+func (q *QuerySet) LeftJoinAsOn(table, as, on string) *QuerySet {
+	q.set[QLEFTJOIN] = fmt.Sprintf(" %s `%s` AS %s ON %s ", QLEFTJOIN[1:], table, as, on)
 	return q
 }
 
@@ -355,8 +361,11 @@ func (q *QuerySet) sql() string {
 		sql += v.value
 	}
 
-	// fmt.Printf("sql:%s\n", sql)
 	return sql
+}
+
+func (q *QuerySet) Sql() {
+	fmt.Printf("sql:%s\n", q.sql())
 }
 
 type qscore struct {
