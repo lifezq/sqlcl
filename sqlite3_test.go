@@ -32,7 +32,7 @@ func TestSqlite3DB(t *testing.T) {
 	if err != nil {
 		t.Fatalf("#001  err:%v\n", err)
 	}
-	t.Logf("#001 sql:%s  err:%v\n", qset.sql(), err)
+	// t.Logf("#001 sql:%s  err:%v\n", qset.sql(), err)
 
 	for i := 0; i < 1000; i++ {
 
@@ -74,7 +74,7 @@ func TestSqlite3DB(t *testing.T) {
 		offset += limit
 	}
 
-	t.Logf("#003 rs.len:%d err:%v", total, err)
+	// t.Logf("#003 rs.len:%d err:%v", total, err)
 
 	db.PrepareClose(qset)
 
