@@ -17,7 +17,6 @@ script:
   - go fmt ./...
   - go vet ./...
   - go test -v -coverprofile=sqlite3.coverprofile -run Sqlite3 
-  - go test -v -coverprofile=sql.coverprofile -run MysqlSql 
-  - go test -v -coverprofile=sql.coverprofile -run MysqlDB
+  - go test -v -coverprofile=sql.coverprofile -run Mysql
   - gover
   - goveralls -coverprofile=gover.coverprofile -service=travis-ci

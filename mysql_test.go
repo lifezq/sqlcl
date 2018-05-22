@@ -53,7 +53,7 @@ func TestMysqlDB(t *testing.T) {
 		Driver:   "mysql",
 		Addr:     "127.0.0.1:3306",
 		User:     "root",
-		Pass:     "",
+		Pass:     "yql@123456",
 		DbName:   "test",
 		Protocol: "tcp",
 		Params:   "charset=utf8",
@@ -150,7 +150,7 @@ func TestMysqlRollBack(t *testing.T) {
 		Driver:   "mysql",
 		Addr:     "127.0.0.1:3306",
 		User:     "root",
-		Pass:     "",
+		Pass:     "yql@123456",
 		DbName:   "test",
 		Protocol: "tcp",
 		Params:   "charset=utf8",
@@ -202,7 +202,7 @@ func TestMysqlRollBack(t *testing.T) {
 			t.Fatalf("rst.RowsAffected err:%s", err.Error())
 		}
 
-		t.Logf("New.db.Tx lid:%d aft:%d\n", lid, aft)
+		// t.Logf("New.db.Tx lid:%d aft:%d\n", lid, aft)
 	}
 
 	if err := db.TxPrepare(qset.Clear().UpdateTable("test_temp").UpdateSet("title=?,content=?").Where("id").Eq("?")); err != nil {
@@ -225,7 +225,7 @@ func TestMysqlRollBack(t *testing.T) {
 			t.Fatalf("rst.RowsAffected aft:%d", aft)
 		}
 
-		t.Logf("Update.db.Tx lid:%d aft:%d\n", i, aft)
+		// t.Logf("Update.db.Tx lid:%d aft:%d\n", i, aft)
 	}
 
 	rst, err := db.TxExec(qset.Clear().UpdateTable("test_temp").UpdateSet("num=num+?").Where("id").Eq(fmt.Sprintf("%d", lid)), fmt.Sprintf("%.2f", 10.07))
@@ -237,7 +237,7 @@ func TestMysqlRollBack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("rst.RowsAffected err:%s", err.Error())
 	}
-	t.Logf("Update.db.Tx lid:%d aft:%d\n", lid, aft)
+	// t.Logf("Update.db.Tx lid:%d aft:%d\n", lid, aft)
 
 	db.TxPrepareClose(qset)
 
