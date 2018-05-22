@@ -90,7 +90,8 @@ func TestSqlite3Tx(t *testing.T) {
 
 	db, err := New(Config{
 		Driver: "sqlite3",
-		Addr:   ":memory:",
+		Addr:   "file::memory:?mode=memory&cache=shared",
+		// Addr:   ":memory:",
 	})
 	if err != nil {
 		t.Fatalf("db conn err:%s", err.Error())

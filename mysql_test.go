@@ -84,7 +84,7 @@ func TestMysqlDB(t *testing.T) {
 	for i := 0; i < 100; i++ {
 
 		if _, err := db.PrepareQuery(qset, 1, 2, 3); err != nil {
-			t.Errorf("db.PrepareQuery rst:%v err:%v", err)
+			t.Errorf("db.PrepareQuery err:%v", err)
 			break
 		}
 	}
@@ -214,7 +214,7 @@ func TestMysqlRollBack(t *testing.T) {
 		}
 
 		if aft < 1 {
-			t.Fatalf("rst.RowsAffected aft:%s", aft)
+			t.Fatalf("rst.RowsAffected aft:%d", aft)
 		}
 
 		t.Logf("Update.db.Tx lid:%d aft:%d\n", i, aft)
