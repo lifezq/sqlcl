@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestSqlite3(t *testing.T) {
+func TestSqlite3DB(t *testing.T) {
 
 	db, err := New(Config{
 		Driver: "sqlite3",
@@ -98,7 +98,7 @@ func TestSqlite3Tx(t *testing.T) {
 	}
 	defer db.Close()
 
-	rs, err := db.ExecString("create table if not exists foo(id integer not null primary key autoincrement, name text)")
+	rs, err := db.ExecString("create temporary table if not exists foo(id integer not null primary key autoincrement, name text)")
 	if err != nil {
 		t.Fatalf("Tx.#000 rs:%v err:%v\n", rs, err)
 	}
