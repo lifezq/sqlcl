@@ -53,7 +53,7 @@ func TestMysqlDB(t *testing.T) {
 		Driver:   "mysql",
 		Addr:     "127.0.0.1:3306",
 		User:     "root",
-		Pass:     "yql@123456",
+		Pass:     "",
 		DbName:   "test",
 		Protocol: "tcp",
 		Params:   "charset=utf8",
@@ -63,6 +63,14 @@ func TestMysqlDB(t *testing.T) {
 		t.Fatalf("Db db err:%s\n", err.Error())
 	}
 	defer db.Close()
+
+	db.ExecString(`charset utf8`)
+
+	db.ExecString(`DROP TABLE IF EXISTS test_temp`)
+
+	db.ExecString(`CREATE TABLE IF NOT EXISTS test_temp(id int(11) primary key auto_increment, 
+		title varchar(30) not null default '', content varchar(100) not null default '',
+		num float(9,2) not null default 0)engine=innodb default charset utf8`)
 
 	qset := NewQuerySet()
 
@@ -142,7 +150,7 @@ func TestMysqlRollBack(t *testing.T) {
 		Driver:   "mysql",
 		Addr:     "127.0.0.1:3306",
 		User:     "root",
-		Pass:     "yql@123456",
+		Pass:     "",
 		DbName:   "test",
 		Protocol: "tcp",
 		Params:   "charset=utf8",
@@ -246,7 +254,7 @@ func TestMysqlRollBack(t *testing.T) {
 		t.Fatalf("db.TxCommit err:%s", err.Error())
 	}
 
-	// db.ExecString(`drop table test_temp`)
+	db.ExecString(`drop table test_temp`)
 }
 
 func do_sql_test(qneed string, q *QuerySet, t *testing.T) {
