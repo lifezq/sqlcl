@@ -2,7 +2,7 @@ version: build-{build}.{branch}
 
 build: off
 
-clone_folder: c:\gopath\src\github.com\lifezq\goutils
+clone_folder: c:\gopath\src\github.com\lifezq\sqlcl
 
 environment:
   GOPATH: c:\gopath
