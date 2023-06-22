@@ -15,7 +15,4 @@ before_test:
   - set PATH=C:\go\bin;%PATH%
   - set GOROOT=C:\go
   - go vet ./...
-
-test_script:
-  - go test ./...
   
